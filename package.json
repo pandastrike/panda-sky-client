@@ -1,0 +1,50 @@
+{
+  "name": "panda-sky-client",
+  "version": "0.0.1",
+  "description": "Auto-assembling client for APIs deployed with Panda Sky",
+  "main": "lib/index.js",
+  "scripts": {
+    "prepare": "node_modules/.bin/coffee --compile --transpile --inline-map --output lib/ src/",
+    "postpublish": "(json -f package.json version | xargs -I version git tag -am version version) && git push --tags",
+    "test": "coffee --transpile --inline-map test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pandastrike/panda-sky-client.git"
+  },
+  "keywords": [
+    "Panda",
+    "Sky",
+    "serverless",
+    "AWS",
+    "Gateway",
+    "Lambda"
+  ],
+  "contributors": [
+    {
+      "name": "Dan Yoder",
+      "email": "dan@pandastrike.com"
+    },
+    {
+      "name": "David Harper",
+      "email": "david@pandastrike.com"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pandastrike/panda-sky-client/issues"
+  },
+  "homepage": "https://github.com/pandastrike/panda-sky-client#readme",
+  "dependencies": {
+    "fairmont": "2.0.1",
+    "mime": "^2.0.3"
+  },
+  "devDependencies": {
+    "babel-core": "6.26.0",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "1.6.1",
+    "coffeescript": "2.1.0",
+    "json": "^9.0.6",
+    "source-map-support": "^0.5.0"
+  }
+}
