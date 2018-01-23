@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "description": "Auto-assembling client for APIs deployed with Panda Sky",
   "main": "lib/index.js",
+  "files": [
+    "lib/",
+    "LICENSE"
+  ],
   "scripts": {
     "prepare": "node_modules/.bin/coffee --compile --transpile --inline-map --output lib/ src/",
     "postpublish": "(json -f package.json version | xargs -I version git tag -am version version) && git push --tags",
@@ -37,7 +41,8 @@
   "homepage": "https://github.com/pandastrike/panda-sky-client#readme",
   "dependencies": {
     "fairmont": "2.0.1",
-    "mime": "^2.0.3"
+    "mime": "^2.0.3",
+    "url-template": "^2.0.8"
   },
   "devDependencies": {
     "babel-core": "6.26.0",
