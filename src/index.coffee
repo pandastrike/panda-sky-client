@@ -4,40 +4,50 @@ import {join} from "path"
 import http2 from "http2"
 import urlTemplate from "url-template"
 
+class HttpError extends Error
+  constructor: (message, @code) ->
+    super message
+    @statusCode = @code
 
 connect = (url) -> http2.connect url
 
-request = (client, headers, options, body) ->
-  console.log headers
+request = ({client, headers, options={}, body}) ->
   promise (y, n) ->
     data = ""
-    client.once "error", n
-    if options
-      req = client.request headers, options
-    else
-      req = client.request headers
+    status = undefined
 
-    body.pipe(req) if body
+    client.once "error", n
+
+    req = client.request headers, options
+    req.write body if body
 
     req.once "error", (e) -> n e
-    # req.on "response", (headers, flags) ->
-    #   if headers.status >= 400
-    #     console.log "error response", headers
+    req.on "response", (headers, flags) -> status = headers[":status"]
     req.on "data", (chunk) -> data += chunk
-    req.on "end", -> y JSON.parse data
+    req.on "end", -> y {data, status}
     req.end()
+
+statusCheck = (expected, {status, data}) ->
+  if status in expected
+    if status == expected[0]
+      JSON.parse data # TODO: make this sensitive to mediatype
+    else
+      throw new HttpError data, status
+  else
+    throw new Error "Encountered status code not specified in API definition #{status}. #{data}"
+
 
 method = (name) ->
   (client, description, body) ->
+    {path, expected} = description
     headers =
       ":method": name
-      ":path": description.path
+      ":path": path
 
-    options = false
-    if !body
-      options = endStream: true
+    options = if body then {} else endStream: true
+    context = {client, headers, options, body}
+    statusCheck expected, await request context
 
-    request client, headers, options
 
 http =
   get: method "GET"
@@ -59,7 +69,8 @@ createResource = (context, {uriTemplate, methods}) ->
       get: (target, name) ->
         if (method = methods[name])?
           method.name = name
-          context = merge {path}, context
+          expected = method.signatures.response.status
+          context = merge {path, expected}, context
           createMethod context, method
 
 createClient = (client, basePath, resources) ->
@@ -85,14 +96,15 @@ Method.define createAuthorization, isBasic, isObject,
 Method.define createAuthorization, isBearer, isString,
   (name, token) -> # ...
 
-createMethod = ({client, path}, method) ->
+createMethod = ({client, path, expected}, method) ->
   headers = {}
-  description = {path, headers}
+  description = {path, headers, expected}
   (methodArgs) ->
     if methodArgs
       {body, authorization} = methodArgs
       if body?
         # TODO: this will later rely on the method signature
+        body = JSON.stringify body
         description.headers["content-type"] = "application/json"
       if method.name in ["get", "put", "post", "patch"]
         description.headers["accept"] = "application/json"
@@ -105,7 +117,7 @@ discover = (url, client) ->
   client ?= connect url
   {pathname: basePath} = new URL url
 
-  {resources} = await http.get client, {path: basePath}
+  {resources} = await http.get client, {path: basePath, expected: [200]}
 
   {
     hangup: -> client.destroy()
