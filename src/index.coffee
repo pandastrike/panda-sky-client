@@ -1,4 +1,4 @@
-import {promise, merge, Method, curry, isObject, isString} from "fairmont"
+import {promise, merge, Method, curry, isObject, isString, base64} from "fairmont"
 import {URL} from "url"
 import {join} from "path"
 import http2 from "http2"
@@ -27,20 +27,24 @@ request = ({client, headers, options={}, body}) ->
     req.on "end", -> y {data, status}
     req.end()
 
-statusCheck = (expected, {status, data}) ->
-  if status in expected
-    if status == expected[0]
-      JSON.parse data # TODO: make this sensitive to mediatype
-    else
-      throw new HttpError data, status
+statusCheck = (expected, response) ->
+  console.log response
+  {data, status} = response
+  if status && status == expected[0]
+    # TODO: make this sensitive to mediatype
+    try
+      JSON.parse data
+    catch
+      data
   else
-    throw new Error "Encountered status code not specified in API definition #{status}. #{data}"
+    throw new HttpError data, status
+
 
 
 method = (name) ->
   (client, description, body) ->
-    {path, expected} = description
-    headers =
+    {path, expected, headers} = description
+    headers = merge headers,
       ":method": name
       ":path": path
 
@@ -91,10 +95,10 @@ isBasic = isScheme "basic"
 isBearer = isScheme "bearer"
 
 Method.define createAuthorization, isBasic, isObject,
-  (name, {login, password}) -> # ...
+  (name, {login, password}) -> "Basic " + base64 "#{login}:#{password}"
 
 Method.define createAuthorization, isBearer, isString,
-  (name, token) -> # ...
+  (name, token) -> "Bearer #{token}"
 
 createMethod = ({client, path, expected}, method) ->
   headers = {}
