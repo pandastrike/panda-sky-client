@@ -2,27 +2,27 @@
   "name": "panda-sky-client",
   "version": "0.0.1",
   "description": "Auto-assembling client for APIs deployed with Panda Sky",
-  "main": "lib/index.js",
+  "main": "build/npm/lib/browser/index.js",
   "files": [
-    "lib/",
-    "LICENSE"
+    "build/npm"
   ],
   "scripts": {
-    "prepare": "node_modules/.bin/coffee --compile --transpile --inline-map --output lib/ src/",
-    "postpublish": "(json -f package.json version | xargs -I version git tag -am version version) && git push --tags",
-    "test": "coffee --transpile --inline-map test/"
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pandastrike/panda-sky-client.git"
   },
   "keywords": [
-    "Panda",
+    "Panda Sky",
     "Sky",
     "serverless",
     "AWS",
     "Gateway",
-    "Lambda"
+    "Lambda",
+    "client",
+    "self-assembling",
+    "reflective"
   ],
   "contributors": [
     {
@@ -40,16 +40,22 @@
   },
   "homepage": "https://github.com/pandastrike/panda-sky-client#readme",
   "dependencies": {
-    "fairmont": "2.0.1",
+    "fairmont-core": "^2.1.2",
+    "fairmont-helpers": "^3.3.2",
+    "fairmont-multimethods": "^2.0.2",
+    "fetch-h2": "^0.2.2",
     "mime": "^2.0.3",
     "url-template": "^2.0.8"
   },
   "devDependencies": {
     "babel-core": "6.26.0",
+    "babel-plugin-dynamic-import-node": "^1.2.0",
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "1.6.1",
     "coffeescript": "2.1.0",
-    "json": "^9.0.6",
+    "fairmont-build-tools": "file:../fairmont-build-tools",
+    "gulp": "github:gulpjs/gulp#4.0",
     "source-map-support": "^0.5.0"
   }
 }
