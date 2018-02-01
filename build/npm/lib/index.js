@@ -4,27 +4,36 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+var _urlTemplate = require("url-template");
+
+var _urlTemplate2 = _interopRequireDefault(_urlTemplate);
+
+var _fairmontCore = require("fairmont-core");
+
+var _fairmontHelpers = require("fairmont-helpers");
+
+var _fairmontMultimethods = require("fairmont-multimethods");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-var skyClient;
+var skyClient, urlJoin;
+
+// Join the basepath to the API endpoint path.
+urlJoin = function (base, path) {
+  if (base.slice(-1) === "/") {
+    return base.slice(0, -1) + path;
+  } else {
+    return base + path;
+  }
+};
 
 skyClient = (() => {
-  var _ref = _asyncToGenerator(function* (discoveryURL) {
-    var HttpError, Method, base64, createAuthorization, createClient, createMethod, createResource, createTemplate, curry, disconnectAll, fetch, http, isBasic, isBearer, isObject, isScheme, isString, merge, method, resources, response, statusCheck, urlTemplate;
-    if (/^.*\/$/.test(discoveryURL)) {
-      discoveryURL = discoveryURL.slice(0, -1);
-    }
-    // These node libraries will always get loaded / bundled.
-    urlTemplate = yield Promise.resolve().then(() => require("url-template"));
-    ({ curry } = yield Promise.resolve().then(() => require("fairmont-core")));
-    ({ merge, isObject, isString, base64 } = yield Promise.resolve().then(() => require("fairmont-helpers")));
-    ({ Method } = yield Promise.resolve().then(() => require("fairmont-multimethods")));
-    // Dynamic imports based on whether or not we're in a browser.
-    if (typeof window !== "undefined" && window !== null) {
-      fetch = window.fetch;
-      disconnectAll = void 0;
-    } else {
-      ({ fetch, disconnectAll } = yield Promise.resolve().then(() => require("fetch-h2")));
+  var _ref = _asyncToGenerator(function* (discoveryURL, fetch) {
+    var HttpError, createAuthorization, createClient, createMethod, createResource, createTemplate, http, isBasic, isBearer, isScheme, method, resources, response, statusCheck;
+    if ((fetch != null ? fetch : fetch = typeof window !== "undefined" && window !== null ? window.fetch : void 0) == null) {
+      throw new Error("Provide fetch API, ex: fetch-h2");
     }
     HttpError = class HttpError extends Error {
       constructor(message, status1) {
@@ -52,7 +61,7 @@ skyClient = (() => {
         }
       });
 
-      return function statusCheck(_x2, _x3) {
+      return function statusCheck(_x3, _x4) {
         return _ref2.apply(this, arguments);
       };
     })();
@@ -75,7 +84,7 @@ skyClient = (() => {
           return statusCheck(expected, response);
         });
 
-        return function (_x4, _x5, _x6) {
+        return function (_x5, _x6, _x7) {
           return _ref3.apply(this, arguments);
         };
       })();
@@ -91,7 +100,7 @@ skyClient = (() => {
     };
     createTemplate = function (T) {
       return function (description) {
-        return urlTemplate.parse(T).expand(description);
+        return _urlTemplate2.default.parse(T).expand(description);
       };
     };
     createResource = function (context, { uriTemplate, methods }) {
@@ -99,14 +108,14 @@ skyClient = (() => {
       createPath = createTemplate(uriTemplate);
       return function (description = {}) {
         var path;
-        path = context.basePath + createPath(description);
+        path = urlJoin(context.basePath, createPath(description));
         return new Proxy({}, {
           get: function (target, name) {
             var expected;
             if ((method = methods[name]) != null) {
               method.name = name;
               expected = method.signatures.response.status;
-              context = merge({ path, expected }, context);
+              context = (0, _fairmontHelpers.merge)({ path, expected }, context);
               return createMethod(context, method);
             }
           }
@@ -124,8 +133,8 @@ skyClient = (() => {
         }
       });
     };
-    createAuthorization = Method.create();
-    Method.define(createAuthorization, isObject, function (schemes) {
+    createAuthorization = _fairmontMultimethods.Method.create();
+    _fairmontMultimethods.Method.define(createAuthorization, _fairmontHelpers.isObject, function (schemes) {
       var name, results, value;
       results = [];
       for (name in schemes) {
@@ -134,15 +143,15 @@ skyClient = (() => {
       }
       return results;
     });
-    isScheme = curry(function (scheme, name) {
+    isScheme = (0, _fairmontCore.curry)(function (scheme, name) {
       return scheme === name.toLowerCase();
     });
     isBasic = isScheme("basic");
     isBearer = isScheme("bearer");
-    Method.define(createAuthorization, isBasic, isObject, function (name, { login, password }) {
-      return "Basic " + base64(`${login}:${password}`);
+    _fairmontMultimethods.Method.define(createAuthorization, isBasic, _fairmontHelpers.isObject, function (name, { login, password }) {
+      return "Basic " + (0, _fairmontHelpers.base64)(`${login}:${password}`);
     });
-    Method.define(createAuthorization, isBearer, isString, function (name, token) {
+    _fairmontMultimethods.Method.define(createAuthorization, isBearer, _fairmontHelpers.isString, function (name, token) {
       return `Bearer ${token}`;
     });
     createMethod = function ({ path, expected }, method) {
@@ -171,14 +180,10 @@ skyClient = (() => {
     // With everything defined, use the discovery endpoint, parse to build the client and then return the client.
     response = yield fetch(discoveryURL);
     ({ resources } = yield response.json());
-    return {
-      disconnectAll,
-      hangup: disconnectAll,
-      client: createClient(discoveryURL, resources)
-    };
+    return createClient(discoveryURL, resources);
   });
 
-  return function skyClient(_x) {
+  return function skyClient(_x, _x2) {
     return _ref.apply(this, arguments);
   };
 })();

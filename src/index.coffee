@@ -1,18 +1,18 @@
-skyClient = (discoveryURL) ->
-  discoveryURL = discoveryURL[...-1] if /^.*\/$/.test discoveryURL
+import urlTemplate from "url-template"
+import {curry} from "fairmont-core"
+import {merge, isObject, isString, base64} from "fairmont-helpers"
+import {Method} from "fairmont-multimethods"
 
-  # These node libraries will always get loaded / bundled.
-  urlTemplate = await `import("url-template")`
-  {curry} = await `import("fairmont-core")`
-  {merge, isObject, isString, base64} = await `import("fairmont-helpers")`
-  {Method} = await `import("fairmont-multimethods")`
-
-  # Dynamic imports based on whether or not we're in a browser.
-  if window?
-    fetch = window.fetch
-    disconnectAll = undefined
+# Join the basepath to the API endpoint path.
+urlJoin = (base, path) ->
+  if base[-1..] == "/"
+    base[...-1] + path
   else
-    {fetch, disconnectAll} = await `import("fetch-h2")`
+    base + path
+
+skyClient = (discoveryURL, fetch) ->
+  if !(fetch ?= window?.fetch)?
+    throw new Error "Provide fetch API, ex: fetch-h2"
 
   class HttpError extends Error
     constructor: (message, @status) ->
@@ -64,7 +64,7 @@ skyClient = (discoveryURL) ->
   createResource = (context, {uriTemplate, methods}) ->
     createPath = createTemplate uriTemplate
     (description={}) ->
-      path = context.basePath + createPath(description)
+      path = urlJoin context.basePath, createPath(description)
       new Proxy {},
         get: (target, name) ->
           if (method = methods[name])?
@@ -116,10 +116,6 @@ skyClient = (discoveryURL) ->
   # With everything defined, use the discovery endpoint, parse to build the client and then return the client.
   response = await fetch discoveryURL
   {resources} = await response.json()
-  {
-    disconnectAll
-    hangup: disconnectAll
-    client: createClient discoveryURL, resources
-  }
+  createClient discoveryURL, resources
 
 export default skyClient

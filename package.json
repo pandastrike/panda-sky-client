@@ -2,7 +2,7 @@
   "name": "panda-sky-client",
   "version": "0.0.1",
   "description": "Auto-assembling client for APIs deployed with Panda Sky",
-  "main": "build/npm/lib/browser/index.js",
+  "main": "build/npm/lib/index.js",
   "files": [
     "build/npm"
   ],
@@ -43,7 +43,6 @@
     "fairmont-core": "^2.1.2",
     "fairmont-helpers": "^3.3.2",
     "fairmont-multimethods": "^2.0.2",
-    "fetch-h2": "^0.2.2",
     "mime": "^2.0.3",
     "url-template": "^2.0.8"
   },
@@ -54,7 +53,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "1.6.1",
     "coffeescript": "2.1.0",
-    "fairmont-build-tools": "file:../fairmont-build-tools",
+    "fairmont-build-tools": "1.0.2",
     "gulp": "github:gulpjs/gulp#4.0",
     "source-map-support": "^0.5.0"
   }
