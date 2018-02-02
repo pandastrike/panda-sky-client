@@ -61,8 +61,8 @@ skyClient = (discoveryURL, fetch) ->
   createTemplate = (T) ->
     (description) -> urlTemplate.parse(T).expand description
 
-  createResource = (context, {uriTemplate, methods}) ->
-    createPath = createTemplate uriTemplate
+  createResource = (context, {template, methods}) ->
+    createPath = createTemplate template
     (description={}) ->
       path = urlJoin context.basePath, createPath(description)
       new Proxy {},

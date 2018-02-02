@@ -103,9 +103,9 @@ skyClient = (() => {
         return _urlTemplate2.default.parse(T).expand(description);
       };
     };
-    createResource = function (context, { uriTemplate, methods }) {
+    createResource = function (context, { template, methods }) {
       var createPath;
-      createPath = createTemplate(uriTemplate);
+      createPath = createTemplate(template);
       return function (description = {}) {
         var path;
         path = urlJoin(context.basePath, createPath(description));

@@ -1,6 +1,6 @@
 {
   "name": "panda-sky-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Auto-assembling client for APIs deployed with Panda Sky",
   "main": "build/npm/lib/index.js",
   "files": [
