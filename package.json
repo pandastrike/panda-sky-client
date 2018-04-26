@@ -1,6 +1,6 @@
 {
   "name": "panda-sky-client",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Auto-assembling client for APIs deployed with Panda Sky",
   "main": "build/npm/lib/index.js",
   "files": [
@@ -44,6 +44,7 @@
     "fairmont-helpers": "^3.3.2",
     "fairmont-multimethods": "^2.0.2",
     "mime": "^2.0.3",
+    "tweetnacl-util": "^0.15.0",
     "url-template": "^2.0.8"
   },
   "devDependencies": {

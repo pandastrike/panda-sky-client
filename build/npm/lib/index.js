@@ -14,11 +14,17 @@ var _fairmontHelpers = require("fairmont-helpers");
 
 var _fairmontMultimethods = require("fairmont-multimethods");
 
+var _tweetnaclUtil = require("tweetnacl-util");
+
+var _tweetnaclUtil2 = _interopRequireDefault(_tweetnaclUtil);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-var skyClient, urlJoin;
+var decodeBase64, decodeUTF8, encodeBase64, encodeUTF8, skyClient, urlJoin;
+
+({ decodeBase64, decodeUTF8, encodeBase64, encodeUTF8 } = _tweetnaclUtil2.default);
 
 // Join the basepath to the API endpoint path.
 urlJoin = function (base, path) {
@@ -149,7 +155,7 @@ skyClient = (() => {
     isBasic = isScheme("basic");
     isBearer = isScheme("bearer");
     _fairmontMultimethods.Method.define(createAuthorization, isBasic, _fairmontHelpers.isObject, function (name, { login, password }) {
-      return "Basic " + (0, _fairmontHelpers.base64)(`${login}:${password}`);
+      return "Basic " + encodeBase64(decodeUTF8(`${login}:${password}`));
     });
     _fairmontMultimethods.Method.define(createAuthorization, isBearer, _fairmontHelpers.isString, function (name, token) {
       return `Bearer ${token}`;

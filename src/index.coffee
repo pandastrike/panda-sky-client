@@ -1,7 +1,11 @@
 import urlTemplate from "url-template"
 import {curry} from "fairmont-core"
-import {merge, isObject, isString, base64} from "fairmont-helpers"
+import {merge, isObject, isString} from "fairmont-helpers"
 import {Method} from "fairmont-multimethods"
+
+# TODO: replace this with a more robust string encode/decode tool.
+import nacl from "tweetnacl-util"
+{decodeBase64, decodeUTF8, encodeBase64, encodeUTF8} = nacl
 
 # Join the basepath to the API endpoint path.
 urlJoin = (base, path) ->
@@ -91,7 +95,8 @@ skyClient = (discoveryURL, fetch) ->
   isBearer = isScheme "bearer"
 
   Method.define createAuthorization, isBasic, isObject,
-    (name, {login, password}) -> "Basic " + base64 "#{login}:#{password}"
+    (name, {login, password}) ->
+      "Basic " + encodeBase64 decodeUTF8 "#{login}:#{password}"
 
   Method.define createAuthorization, isBearer, isString,
     (name, token) -> "Bearer #{token}"
