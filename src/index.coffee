@@ -45,8 +45,9 @@ skyClient = (discoveryURL, fetch) ->
         method: name
         headers
         mode: "cors"
-        redirect: shouldFollow
       }
+
+      init.redirect = shouldFollow if shouldFollow
       init.body = body if body
 
       response = await fetch path, init
@@ -106,7 +107,7 @@ skyClient = (discoveryURL, fetch) ->
     description = {path, headers, expected}
     (methodArgs) ->
       if methodArgs
-        {body, authorization, shouldFollow=false} = methodArgs
+        {body, authorization, shouldFollow} = methodArgs
         if body?
           # TODO: this will later rely on the method signature
           body = JSON.stringify body

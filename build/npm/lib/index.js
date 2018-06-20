@@ -80,9 +80,11 @@ skyClient = (() => {
           init = {
             method: name,
             headers,
-            mode: "cors",
-            redirect: shouldFollow
+            mode: "cors"
           };
+          if (shouldFollow) {
+            init.redirect = shouldFollow;
+          }
           if (body) {
             init.body = body;
           }
@@ -167,7 +169,7 @@ skyClient = (() => {
       return function (methodArgs) {
         var authorization, body, ref, shouldFollow;
         if (methodArgs) {
-          ({ body, authorization, shouldFollow = false } = methodArgs);
+          ({ body, authorization, shouldFollow } = methodArgs);
           if (body != null) {
             // TODO: this will later rely on the method signature
             body = JSON.stringify(body);
