@@ -1,7 +1,8 @@
 import urlTemplate from "url-template"
-import {curry} from "fairmont-core"
-import {merge, isObject, isString} from "fairmont-helpers"
-import {Method} from "fairmont-multimethods"
+import {curry} from "panda-garden"
+import {merge, isObject, isString} from "panda-parchment"
+import {Method} from "panda-generics"
+import log from "./log"
 
 # TODO: replace this with a more robust string encode/decode tool.
 import nacl from "tweetnacl-util"
@@ -14,15 +15,18 @@ urlJoin = (base, path) ->
   else
     base + path
 
-skyClient = (discoveryURL, fetch) ->
+skyClient = (discoveryURL, fetch, loggingFlag) ->
   if !(fetch ?= window?.fetch)?
     throw new Error "Provide fetch API, ex: fetch-h2"
+
+  if loggingFlag
+    fetch = log fetch
 
   class HttpError extends Error
     constructor: (message, @status) ->
       super message
 
-  statusCheck = (expected, response) ->
+  statusCheck = (expected, response, request) ->
     {status, statusText} = response
     if status && status == expected[0]
       data = ""
@@ -33,15 +37,15 @@ skyClient = (discoveryURL, fetch) ->
       catch e
         data
     else
-      throw new HttpError statusText, status
-
+      throw new HttpError "Panda Sky Client failure for #{request.method} #{request.path} #{statusText}", status
 
   method = (name) ->
     (description, body, shouldFollow) ->
-      {path, expected, headers} = description
+      {path, expected, headers, resourceName} = description
 
       # Setup the fetch init object
       init = {
+        resourceName
         method: name
         headers
         mode: "cors"
@@ -51,7 +55,7 @@ skyClient = (discoveryURL, fetch) ->
       init.body = body if body
 
       response = await fetch path, init
-      statusCheck expected, response
+      statusCheck expected, response, {path, method: name}
 
 
   http =
@@ -83,7 +87,7 @@ skyClient = (discoveryURL, fetch) ->
     new Proxy {},
       get: (target, name) ->
         if resources[name]?
-          createResource context, resources[name]
+          createResource (merge context, {resourceName: name}), resources[name]
 
   createAuthorization = Method.create()
 
@@ -102,9 +106,8 @@ skyClient = (discoveryURL, fetch) ->
   Method.define createAuthorization, isBearer, isString,
     (name, token) -> "Bearer #{token}"
 
-  createMethod = ({path, expected}, method) ->
-    headers = {}
-    description = {path, headers, expected}
+  createMethod = (context, method) ->
+    description = merge context, {headers: {}}
     (methodArgs) ->
       if methodArgs
         {body, authorization, shouldFollow} = methodArgs
