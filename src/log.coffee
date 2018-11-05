@@ -3,7 +3,10 @@ import {merge} from "panda-parchment"
 json = (obj) -> console.log "JSON", JSON.stringify obj
 
 isCacheHit = (response) ->
-  response.headers?["x-cache"] && /^Hit/.test response.headers["x-cache"]
+  if value = response.headers.get("x-cache")
+    /^Hit/.test value
+  else
+    false
 
 Log = (fn) ->
   (args...) ->
