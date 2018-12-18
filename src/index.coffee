@@ -29,13 +29,7 @@ skyClient = (discoveryURL, fetch, loggingFlag) ->
   statusCheck = (expected, response, request) ->
     {status, statusText} = response
     if status && status == expected[0]
-      data = ""
-      try
-        # TODO: make this sensitive to mediatype
-        data = await response.text()
-        JSON.parse data
-      catch e
-        data
+      response
     else
       throw new HttpError "Panda Sky Client failure for #{request.method} #{request.path} #{statusText}", status
 
