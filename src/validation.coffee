@@ -9,10 +9,10 @@ check = (expected, response, request) ->
     throw new HttpError message, response.status
 
   for header in expected.headers
-    unless response.headers.get(header)?.length > 0
+    unless response.headers.get(header)?
       message = "invalid response header on #{request.method} #{expected.resource} (#{request.path}) #{header} was not present or null"
-      console.error message
-      throw new Error message
+      console.warn message
+      # throw new Error message
 
   response
 
