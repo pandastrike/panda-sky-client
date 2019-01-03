@@ -1,24 +1,22 @@
-import {merge} from "panda-parchment"
+import {merge} from "./utils"
 import buildAuthorization from "./authorization"
-import check from "./validation"
+import {requestCheck, responseCheck} from "./validation"
 
 method = (name) ->
-  (fetch, description, body, shouldFollow) ->
-    {path, expected, headers, resourceName} = description
-
-    # Setup the fetch init object
+  (lib, context) ->
+    # Setup the Fetch init object
     init = {
-      resourceName
       method: name
-      headers
+      headers: context.headers
       mode: "cors"
     }
 
-    init.redirect = shouldFollow if shouldFollow
-    init.body = body if body
+    init.redirect = context.shouldFollow if context.shouldFollow?
+    init.body = context.body if context.body?
 
-    response = await fetch path, init
-    check expected, response, {path, method: name}
+    requestCheck lib, context
+    response = await lib.fetch context.path, init, context
+    await responseCheck lib, context, response
 
 http =
   get: method "GET"
@@ -29,19 +27,40 @@ http =
   head: method "HEAD"
   options: method "OPTIONS"
 
-createMethod = (fetch, context, method) ->
-  description = merge context, {headers: {}}
+parseSignature = (signatures) ->
+  {response} = signatures
+  status = response.status[0]
+
+  headers = []
+  if status == 201
+    headers.push "location"
+  if response.cache?
+    {etag, maxAge, lastModified} = response.cache
+    if etag?
+      headers.push "etag"
+    if maxAge? || lastModified?
+      headers.push "cache-control"
+
+  {status, headers}
+
+createMethod = (lib, context, method) ->
   (methodArgs) ->
+    _context = merge context,
+      headers: {}
+      expected: parseSignature context.signatures
+
     if methodArgs
       {body, authorization, shouldFollow} = methodArgs
+      _context.shouldFollow = shouldFollow
       if body?
         # TODO: this will later rely on the method signature
-        body = JSON.stringify body
-        description.headers["content-type"] = "application/json"
-      if method.name in ["get", "put", "post", "patch"]
-        description.headers["accept"] = "application/json"
+        _context.body = JSON.stringify body
+        _context.headers["content-type"] = "application/json"
+      if context.methodName in ["get", "put", "post", "patch"]
+        _context.headers["accept"] = "application/json"
       if authorization?
-        description.headers["authorization"] = buildAuthorization authorization
-    http[method.name] fetch, description, body, shouldFollow
+        _context.headers["authorization"] = buildAuthorization authorization
+
+    http[context.methodName] lib, _context
 
 export default createMethod

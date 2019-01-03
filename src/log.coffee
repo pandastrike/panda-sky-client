@@ -1,4 +1,4 @@
-import {merge} from "panda-parchment"
+import {merge} from "./utils"
 
 json = (obj) -> console.log "JSON", JSON.stringify obj
 
@@ -10,13 +10,13 @@ isCacheHit = (response) ->
 
 Log = (fn) ->
   (args...) ->
-    if args[1]
-      {method, resourceName} = args[1]
+    if args[2]
+      {methodName, resourceName} = args[2]
     else
-      method = "get"
+      methodName = "get"
       resourceName = "discovery"
 
-    tag = "#{resourceName + method[0].toUpperCase() + method[1...]}"
+    tag = "#{resourceName + methodName.toUpperCase()}"
 
     json
       networkAttempt: true
@@ -46,6 +46,7 @@ Log = (fn) ->
       json
         networkFail: true
         tag: tag
+      console.log e
       throw new Error e
 
 export default Log
