@@ -1,6 +1,6 @@
 import urlTemplate from "url-template"
 import createMethod from "./method"
-import {merge} from "./utils"
+import {merge} from "panda-parchment"
 
 # Join the basepath to the API endpoint path.
 urlJoin = (base, path) ->
@@ -17,10 +17,18 @@ createResource = (lib, context, {template, methods}) ->
   (description={}) ->
     new Proxy {},
       get: (target, name) ->
+        path = createPath(description)
+        url = urlJoin context.basePath, path
+
         if (method = methods[name])?
           {signatures} = method
-          path = urlJoin context.basePath, createPath(description)
           _context = merge context, {path, methodName: name, signatures}
           createMethod lib, _context, method
+        else if name == "path"
+          path
+        else if name == "url"
+          url
+        else
+          undefined
 
 export default createResource

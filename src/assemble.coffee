@@ -1,4 +1,4 @@
-import {merge} from "./utils"
+import {merge} from "panda-parchment"
 import createResource from "./resource"
 
 assemble = (lib, basePath, resources) ->

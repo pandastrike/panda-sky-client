@@ -1,4 +1,4 @@
-import {merge} from "./utils"
+import {merge} from "panda-parchment"
 import buildAuthorization from "./authorization"
 import {requestCheck, responseCheck} from "./validation"
 

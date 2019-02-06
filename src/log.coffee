@@ -1,4 +1,4 @@
-import {merge} from "./utils"
+import {merge} from "panda-parchment"
 
 json = (obj) -> console.log "JSON", JSON.stringify obj
 

@@ -1,10 +1,10 @@
 {
   "name": "panda-sky-client",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Auto-assembling client for APIs deployed with Panda Sky",
   "main": "build/npm/src/index.js",
   "scripts": {
-    "test": "gulp test"
+    "test": "p9k npm:test"
   },
   "repository": {
     "type": "git",
@@ -37,17 +37,14 @@
   },
   "homepage": "https://github.com/pandastrike/panda-sky-client#readme",
   "dependencies": {
+    "@stablelib/base64": "^0.7.2",
+    "@stablelib/utf8": "^0.10.1",
     "panda-generics": "^5.0.0",
-    "tweetnacl-util": "^0.15.0",
+    "panda-parchment": "^4.2.0",
     "url-template": "^2.0.8"
   },
   "devDependencies": {
-    "@babel/core": "^7.1.2",
-    "@babel/preset-env": "^7.1.0",
-    "amen": "^2.1.0",
-    "coffeescript": "^2.3.2",
-    "gulp": "github:gulpjs/gulp#v4.0.0",
-    "panda-builder": "^2.4.1",
-    "source-map-support": "^0.5.0"
+    "panda-9000": "^4.4.0",
+    "panda-builder": "^3.2.1"
   }
 }
