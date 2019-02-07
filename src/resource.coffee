@@ -22,7 +22,7 @@ createResource = (lib, context, {template, methods}) ->
 
         if (method = methods[name])?
           {signatures} = method
-          _context = merge context, {path, methodName: name, signatures}
+          _context = merge context, {path: url, methodName: name, signatures}
           createMethod lib, _context, method
         else if name == "path"
           path
