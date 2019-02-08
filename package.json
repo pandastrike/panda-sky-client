@@ -1,6 +1,6 @@
 {
   "name": "panda-sky-client",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Auto-assembling client for APIs deployed with Panda Sky",
   "main": "build/npm/src/index.js",
   "scripts": {
@@ -39,7 +39,7 @@
   "dependencies": {
     "@stablelib/base64": "^0.7.2",
     "@stablelib/utf8": "^0.10.1",
-    "panda-generics": "^5.0.0",
+    "panda-generics": "^4.2.0",
     "panda-parchment": "^4.2.0",
     "url-template": "^2.0.8"
   },
