@@ -15,7 +15,11 @@ method = (name) ->
     init.body = context.body if context.body?
 
     requestCheck lib, context
-    response = await lib.fetch context.path, init, context
+
+    # NOTE: There is something special about fetch in the browser.
+    fetch = lib.fetch
+    response = await fetch context.path, init, context
+
     await responseCheck lib, context, response
 
 http =
