@@ -1,4 +1,4 @@
-import Method from "panda-generics"
+import {Method} from "panda-generics"
 import {isObject, isString, toJSON} from "panda-parchment"
 import {encode as decodeUTF8} from "@stablelib/utf8"
 import {encode as encodeBase64} from "@stablelib/base64"
