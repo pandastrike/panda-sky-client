@@ -23,16 +23,15 @@ responseCheck = (lib, context, response) ->
   {resourceName, methodName, path, expected} = context
   methodName = methodName.toUpperCase()
 
-  if response.status != expected.status
-    message = "#{response.status} Panda Sky Client: #{resourceName} #{methodName} -- Unexpected response status from #{path} #{response.statusText}"
+  if response.status not in [expected.status, 304]
+    message = "#{response.status} Panda Sky Client: #{resourceName} #{methodName} -- Unexpected response status from #{path} #{await response.text()}"
     console.warn message
     throw new HttpError message, response.status
 
   for header in expected.headers
     unless response.headers.get(header)?
-      message = "Panda Sky Client: #{resourceName} #{methodName} -- Response header '#{header}' was not present or null"
-      console.warn message
-      throw new Error message
+      throw new Error "Panda Sky Client: #{resourceName} #{methodName} --
+        Response header '#{header}' was not present or null"
 
   response
 

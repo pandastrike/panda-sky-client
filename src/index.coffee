@@ -12,8 +12,12 @@ skyClient = (discoveryURL, options) ->
   if logging?
     fetch = log fetch
 
-  # Fetch from the discovery endpoint, parse,
-  response = await fetch discoveryURL
+  # Fetch from the discovery endpoint and parse,
+  response = await fetch discoveryURL,
+    method: "GET"
+    headers:
+      Accept: "application/json"
+
   {resources} = await response.json()
 
   # lib is the low level interfaces to make and validate the HTTP request.

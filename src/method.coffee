@@ -5,11 +5,10 @@ import {requestCheck, responseCheck} from "./validation"
 method = (name) ->
   (lib, context) ->
     # Setup the Fetch init object
-    init = {
+    init =
       method: name
       headers: context.headers
       mode: "cors"
-    }
 
     init.redirect = context.shouldFollow if context.shouldFollow?
     init.body = context.body if context.body?
