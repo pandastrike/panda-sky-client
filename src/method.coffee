@@ -48,8 +48,11 @@ parseSignature = (signatures) ->
 
 createMethod = (lib, context, method) ->
   (methodArgs) ->
+    headers = {}
+    headers[k] = v for k, v of lib.headers
+
     _context = merge context,
-      headers: {}
+      headers: headers
       expected: parseSignature context.signatures
 
     if methodArgs
