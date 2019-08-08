@@ -61,9 +61,9 @@ createMethod = (lib, context, method) ->
       if body?
         # TODO: this will later rely on the method signature
         _context.body = JSON.stringify body
-        _context.headers["content-type"] = "application/json"
+        _context.headers["content-type"] ?= "application/json"
       if context.methodName in ["get", "put", "post", "patch"]
-        _context.headers["accept"] = "application/json"
+        _context.headers["accept"] ?= "application/json"
       if authorization?
         _context.headers["authorization"] = buildAuthorization authorization
 
