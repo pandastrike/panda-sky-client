@@ -1,4 +1,4 @@
-import {Method} from "panda-generics"
+import Method from "panda-generics"
 import {isObject, isString, toJSON} from "panda-parchment"
 import {encode as decodeUTF8} from "@stablelib/utf8"
 import {encode as encodeBase64} from "@stablelib/base64"
@@ -9,8 +9,9 @@ isBasic = isScheme "basic"
 isBearer = isScheme "bearer"
 isCapability = isScheme "capability"
 
-authorization = Method.create default: (args...) ->
-  throw new Error "panda-sky-client - no matches on #{toJSON args}"
+authorization = Method.create
+  name: "authorization"
+  description: "This creates your Authorization HTTP header based on input configuration"
 
 Method.define authorization, isString, (header) -> header
 
