@@ -8,6 +8,7 @@ isScheme = (scheme) ->
 isBasic = isScheme "basic"
 isBearer = isScheme "bearer"
 isCapability = isScheme "capability"
+isSigil = isScheme "sigil"
 
 authorization = Method.create
   name: "authorization"
@@ -25,6 +26,9 @@ Method.define authorization, isBasic, isObject,
 
 Method.define authorization, isBearer, isString,
   (name, token) -> "Bearer #{token}"
+
+Method.define authorization, isSigil, isString,
+  (name, token) -> "Sigil #{token}"
 
 Method.define authorization, isCapability, isString,
   (name, token) -> "X-Capability #{token}"
