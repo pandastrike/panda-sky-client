@@ -67,6 +67,9 @@ createMethod = (lib, context, method) ->
       if authorization?
         _context.headers["authorization"] = buildAuthorization authorization
 
+    # Override global header settings with anything in the method invocation.
+    _context.headers = merge _context.headers, methodArgs?.headers
+
     http[context.methodName] lib, _context
 
 export default createMethod
